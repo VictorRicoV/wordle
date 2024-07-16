@@ -1,22 +1,14 @@
 // El styles lo importamos aquí para que se encargue Vite de compilar todo
 import '../scss/styles.scss';
 
-const ALL_WORDS = [
-  'casa',
-  'coche',
-  'parque',
-  'velero',
-  'playa',
-  'piscina',
-  'chocar'
-];
+const ALL_WORDS = ['casa', 'coche', 'parque', 'velero', 'playa', 'piscina', 'chocar'];
 const NUMBER_OF_TRIES = 5;
 
 const gameBoardElement = document.getElementById('game-board');
 const userWordFormElement = document.getElementById('user-word-form');
 
 let secretWord = '';
-let currentRowIndex = 0;
+let currentRow = 0;
 
 const chooseSecretWord = () => {
   const randomNumber = Math.floor(Math.random() * ALL_WORDS.length);
@@ -41,23 +33,31 @@ const createGameBoard = () => {
 };
 
 const getInputValue = userWord => {
-  const rows = document.querySelectorAll('.game-board__row');
-  const currentRow = rows[currentRowIndex];
+  let wordToCheck = secretWord;
 
-  if (currentRow) {
-    const letters = currentRow.querySelectorAll('.letter');
-    for (let i = 0; i < userWord.length; i++) {
-      letters[i].textContent = userWord[i];
-      if (userWord[i] === secretWord[i]) {
-        letters[i].classList.add('correct');
-      } else if (secretWord.includes(userWord[i])) {
-        letters[i].classList.add('misplaced');
-      } else {
-        letters[i].classList.add('incorrect');
+  for (let i = 0; i < userWord.length; i++) {
+    const letter = userWord[i];
+    const letterContainer = gameBoardElement.children[currentRow].children[i];
+    letterContainer.textContent = letter;
+
+    if (letter === secretWord[i]) {
+      letterContainer.classList.add('correct');
+      wordToCheck = wordToCheck.replace(letter, '-');
+    }
+  }
+  for (let i = 0; i < userWord.length; i++) {
+    const letter = userWord[i];
+    const letterContainer = gameBoardElement.children[currentRow].children[i];
+    if (wordToCheck.includes(letter)) {
+      letterContainer.classList.add('misplaced');
+    } else {
+      if (!letterContainer.classList.contains('correct')) {
+        letterContainer.classList.add('incorrect');
       }
     }
-    currentRowIndex++;
   }
+
+  currentRow++;
 };
 
 userWordFormElement.addEventListener('submit', event => {
